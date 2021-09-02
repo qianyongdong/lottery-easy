@@ -1,7 +1,7 @@
 const list = new Array(8).fill({ "type": 0, "gl": 0 })
 console.log(list)
 list[1] = { "type": 1, "gl": "20", 'number': '20', 'count': '100' }
-list[2] = { "type": 2, "gl": "80", 'number': '80', 'count': '100', "name": '马克杯', "image": "mkb.png" }
+list[2] = { "type": 2, "gl": "10", 'number': '80', 'count': '100', "name": '马克杯', "image": "mkb.png" }
 const listDom = document.querySelector('.list')
 renderList(list)
 function renderList(list) {

@@ -89,7 +89,12 @@ let lottery = {
         function calcPrize() {
             let prizeWeight = []
             for (const item of lottery.prizeInfo) {
-                prizeWeight.push(+item.count > 0 ? item.gl : 0) //过滤总数量小于0的
+
+                if (item.type > 0) {
+                    prizeWeight.push(+item.count > 0 ? item.gl : 0) //过滤总数量小于0的
+                } else {
+                    prizeWeight.push(item.gl)
+                }
             }
             var leng = 0;
             for (var i = 0; i < prizeWeight.length; i++) {
