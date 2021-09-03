@@ -50,7 +50,7 @@ let lottery = {
             if (item) {
                 if (item.type > 1) {
                     prizeInfoHtml += `<div class="item">
-                    <img src="${item.image}" alt="image">
+                    <img src="${item.image.url}" alt="image">
                     <span>${item.number + "个" + item.name}</span>
             </div>`
                 } else {
@@ -235,7 +235,7 @@ let lottery = {
                             <span class="close"></span>
                         </div>
                         <div class="left-layer-content">
-                            <img  class='layer-img' src="${lottery.prizeInfo[e].image ? lottery.prizeInfo[e].image : lottery.prizeInfo[e].number ? 'test.png' : 'lose.png'}" alt="image">
+                            <img  class='layer-img' src="${lottery.prizeInfo[e].image ? lottery.prizeInfo[e].image.url : lottery.prizeInfo[e].number ? 'test.png' : 'lose.png'}" alt="image">
                             <span class='layer-text'>${lottery.prizeInfo[e].type == 0 ? '没有中奖' : ''} ${lottery.prizeInfo[e].type == 1 ? lottery.prizeInfo[e].number + '矿石' : ''} ${lottery.prizeInfo[e].type == 2 ? lottery.prizeInfo[e].number + '个' + lottery.prizeInfo[e].name : ''}</span>
                             <button class="repeate">再抽一次</button>
                         </div>`

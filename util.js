@@ -1,7 +1,7 @@
 const list = new Array(8).fill({ "type": 0, "gl": 0 })
 console.log(list)
 list[1] = { "type": 1, "gl": "20", 'number': '20', 'count': '100' }
-list[2] = { "type": 2, "gl": "10", 'number': '80', 'count': '100', "name": '马克杯', "image": "mkb.png" }
+list[2] = { "type": 2, "gl": "80", 'number': '80', 'count': '100', "name": '马克杯', "image": { 'name': "mkb.png", 'url': "mkb.png" } }
 const listDom = document.querySelector('.list')
 renderList(list)
 function renderList(list) {
@@ -14,7 +14,11 @@ function renderList(list) {
             for (const key of Object.keys(item)) {
                 let childDiv = document.createElement('div')
                 childDiv.setAttribute('class', key)
-                childDiv.innerHTML = `${key}: ${item[key]}`
+                if (key === 'image') {
+                    childDiv.innerHTML = `${getKey(key)}: ${item[key].name}`
+                } else {
+                    childDiv.innerHTML = `${getKey(key)}: ${item[key]}`
+                }
                 div.appendChild(childDiv)
             }
         } else {
@@ -44,12 +48,18 @@ listDom.querySelectorAll('.item').forEach(element => {
             // inputs[4].value = list[index].image ? '已存在' : ''
             intDom.innerHTML = index + 1
             console.log(+list[index].type)
+            document.querySelector('.tp2').style.display = 'none'
             if (+list[index].type === 2) {
-                console.log(+list[index].type, 1111)
                 sl.style.display = 'block'
                 zsl.style.display = 'block'
                 mc.style.display = 'block'
-                tp.style.display = 'block'
+                if (list[index].image) {
+                    document.querySelector('.tp2>img').src = list[index].image.url
+                    document.querySelector('.tp2').style.display = 'block'
+                    tp.style.display = 'none'
+                } else {
+                    tp.style.display = 'block'
+                }
             } else if (+list[index].type === 1) {
                 sl.style.display = 'block'
                 zsl.style.display = 'block'
@@ -83,9 +93,8 @@ const save = () => {
     let name = inputs[3].value
     let image = inputs[4].files[0];
     //效验概率
-    console.log(gl, calcGl())
-    if (gl > calcGl() && gl > list[index].gl) {
-        return alert('概率违法，应该不超过' + calcGl())
+    if (gl > calcGl(index)) {
+        return alert('概率违法，应该不超过' + calcGl(index))
     }
     if (+type === 1) {
         if (number.length > 0 && count.length > 0) {
@@ -96,7 +105,7 @@ const save = () => {
         }
     } else if (+type === 2) {
         if (number.length > 0 && count.length > 0 && name.length > 0 && image) {
-            listData = { type, gl, number, count, name, 'image': getObjectURL(image) }
+            listData = { type, gl, number, count, name, 'image': { 'name': image.name, 'url': getObjectURL(image) } }
             list[index] = listData
         } else {
             return alert('请填写数量和总数量和名称和图片')
@@ -106,6 +115,7 @@ const save = () => {
         list[index] = listData
     }
     changeList(index)
+    alert('修改成功')
 }
 //切换奖品类型
 let rightLayerSelect = rightLayerDom.querySelector('select')
@@ -148,9 +158,9 @@ function changeList(e) {
             let div = document.createElement('div')
             div.setAttribute('class', key)
             if (key === 'image') {
-                div.innerHTML = `${key}: 'object'`
+                div.innerHTML = `${getKey(key)}: ${list[e][key].name}`
             } else {
-                div.innerHTML = `${key}: ${list[e][key]}`
+                div.innerHTML = `${getKey(key)}: ${list[e][key]} `
             }
             node.appendChild(div)
         }
@@ -159,15 +169,15 @@ function changeList(e) {
     lottery.prizeInfo = list
     lottery.prizeDomCopy[e].innerHTML = ''
     if (list[e]["type"] > 1) {
-        lottery.prizeDomCopy[e].innerHTML = `<div class="item">
-        <img src="${list[e].image}" alt="image">
-        <span>${list[e].number + "个" + list[e].name}</span>
-</div>`
+        lottery.prizeDomCopy[e].innerHTML = `<div class="item" >
+                    <img src="${list[e].image.url}" alt="image">
+                        <span>${list[e].number + "个" + list[e].name}</span>
+                    </div>`
     } else {
-        lottery.prizeDomCopy[e].innerHTML = `<div class="item">
-        <img src="${list[e].number ? 'test.png' : 'lose.png'}" alt="image">
-        <span>${list[e].number ? list[e].number + '矿石' : '没有中奖'}</span>
-</div>`
+        lottery.prizeDomCopy[e].innerHTML = `<div class="item" >
+                    <img src="${list[e].number ? 'test.png' : 'lose.png'}" alt="image">
+                        <span>${list[e].number ? list[e].number + '矿石' : '没有中奖'}</span>
+                    </div>`
     }
 
 }
@@ -187,12 +197,13 @@ function getObjectURL(file) {
 
 }
 //计算概率
-function calcGl() {
+function calcGl(index) {
     let numCount = 0
     for (const item of list) {
         numCount += +item["gl"]
     }
-    return 100 - numCount
+
+    return 100 - +numCount + +list[index].gl
 }
 let coinsDom = document.getElementById('qs')
 let expendDom = document.getElementById('ex')
@@ -204,4 +215,37 @@ coinsDom.addEventListener('change', function (param) {
 expendDom.addEventListener('change', function (param) {
     lottery.expend = +expendDom.value
     document.querySelector('.expend').innerHTML = +expendDom.value + '矿石/次'
+}, false)
+
+function getKey(key) {
+    let name = ''
+    switch (key) {
+        case 'type':
+            name = '类型'
+            break
+        case 'gl':
+            name = '概率'
+            break
+        case 'number':
+            name = '数量'
+            break
+        case 'count':
+            name = '总份'
+            break
+        case 'name':
+            name = '名称'
+            break
+        default:
+            name = '图片'
+    }
+    return name
+
+}
+const tp2 = document.querySelector('.tp2')
+tp2.querySelector('div').addEventListener('click', function () {
+    console.log(document.querySelector('.tp'))
+    if (tp2.style.display == 'block') {
+        tp2.style.display = 'none'
+        document.querySelector('#tp').style.display = 'block'
+    }
 }, false)
