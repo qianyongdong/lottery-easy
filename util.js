@@ -1,7 +1,7 @@
 const list = new Array(8).fill({ "type": 0, "gl": 0 })
 console.log(list)
 list[1] = { "type": 1, "gl": "20", 'number': '20', 'count': '100' }
-list[2] = { "type": 2, "gl": "80", 'number': '80', 'count': '100', "name": '马克杯', "image": { 'name': "mkb.png", 'url': "mkb.png" } }
+list[2] = { "type": 2, "gl": "20", 'number': '1', 'count': '100', "name": '马克杯', "image": { 'name': "mkb.png", 'url': "mkb.png" } }
 const listDom = document.querySelector('.list')
 renderList(list)
 function renderList(list) {
@@ -86,12 +86,17 @@ const save = () => {
     let type = rightLayerDom.querySelector('select').value
     let inputs = rightLayerDom.querySelectorAll('input')
     let index = intDom.innerHTML - 1
-    let listData = { }
+    let listData = {}
     let gl = inputs[0].value || 0
     let number = inputs[1].value
     let count = inputs[2].value
     let name = inputs[3].value
-    let image = inputs[4].files[0];
+    let image = inputs[4].files[0]
+    if (image) {
+        image.url = getObjectURL(image)
+    } else {
+        image = list[index].image
+    }
     //效验概率
     if (gl > calcGl(index)) {
         return alert('概率违法，应该不超过' + calcGl(index))
@@ -104,8 +109,9 @@ const save = () => {
             return alert('请填写数量和总数量')
         }
     } else if (+type === 2) {
+        console.log(image)
         if (number.length > 0 && count.length > 0 && name.length > 0 && image) {
-            listData = { type, gl, number, count, name, 'image': { 'name': image.name, 'url': getObjectURL(image) } }
+            listData = { type, gl, number, count, name, 'image': { 'name': image.name, 'url': image.url } }
             list[index] = listData
         } else {
             return alert('请填写数量和总数量和名称和图片')
